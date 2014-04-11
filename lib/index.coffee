@@ -16,8 +16,9 @@ class Worker
     error: job failed 
     exit: exit entire worker
   ###
-  @construct: (opts):
+  @construct: (opts)->
 
 
 
-
+module.exports = 
+  worker: Worker
