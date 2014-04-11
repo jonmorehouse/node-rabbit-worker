@@ -21,4 +21,4 @@ class Worker
 
 
 module.exports = 
-  worker: Worker
+  Worker: Worker
