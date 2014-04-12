@@ -11,6 +11,11 @@ Features
 * pass in queueName / connection
 * emits tasks
 
+Contributing
+------------
+
+* make sure to have RabbitMQ up and running on machine `brew install rabbitmq`
+* run all tests `cake test`
 
 
 
