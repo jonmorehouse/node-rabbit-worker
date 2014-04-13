@@ -20,8 +20,11 @@ module.exports =
 
   test: (test)->
 
-    #return do test.done
-    subscriber.on "data", (data)->
-      p data
+    subscriber.close()
+    do test.done
+    #subscriber.on "data", (data)->
+      #p data
+    #subscriber.on "end", (data)->
+      #do test.done
 
 

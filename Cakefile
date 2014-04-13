@@ -11,4 +11,14 @@ task "debug", "Temporary development helper", ->
   bootstrap = libRequire "file_subscriber"
 
   boot = new bootstrap()
+  boot.setEncoding "utf-8"
+
+  boot.on "data", (data)->
+
+    p data
+    #boot.close()
+
+
+
+
 
