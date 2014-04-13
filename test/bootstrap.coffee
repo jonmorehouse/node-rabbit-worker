@@ -1,5 +1,6 @@
-path = require "path"
-amqp = require "amqp"
+path = require 'path'
+amqp = require 'amqp'
+fs = require 'fs'
 
 # helper module-wide functions
 baseDirectory = path.resolve path.join __dirname, ".."
@@ -24,6 +25,8 @@ exports.setUp = (cb)->
 
 exports.tearDown = (cb)->
 
+  # remove all of our test handler files
+  fs.unlink path.join baseDirectory, filename for filename in [".graceful", ".restart", ".kill"]
   if global.conn?
     global.conn.disconnect()
   cb?()

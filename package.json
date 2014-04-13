@@ -1,0 +1,30 @@
+{
+  "name": "node-rabbit-worker",
+  "version": "0.0.0",
+  "description": "Stream based wrapper for working with RabbitMQ",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonmorehouse/node-rabbit-worker.git"
+  },
+  "author": "Jon Morehouse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jonmorehouse/node-rabbit-worker/issues"
+  },
+  "homepage": "https://github.com/jonmorehouse/node-rabbit-worker",
+  "dependencies": {
+    "amqp": "^0.2.0",
+    "touch": "0.0.3",
+    "watch": "^0.9.0"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.8.6"
+  }
+}

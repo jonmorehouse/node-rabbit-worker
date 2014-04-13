@@ -1,5 +1,5 @@
 bootstrap = require "../bootstrap"
-{Worker} = libRequire "index"
+#{Worker} = libRequire "index"
 
 module.exports = 
 
