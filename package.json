@@ -21,6 +21,7 @@
   "homepage": "https://github.com/jonmorehouse/node-rabbit-worker",
   "dependencies": {
     "amqp": "^0.2.0",
+    "async": "^0.7.0",
     "touch": "0.0.3",
     "watch": "^0.9.0"
   },

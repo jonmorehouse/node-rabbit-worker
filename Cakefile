@@ -1,3 +1,4 @@
+require "./test/bootstrap"
 nodeunit = require 'nodeunit'
 
 task "test", "Run all tests", ->
@@ -7,7 +8,7 @@ task "test", "Run all tests", ->
 
 task "debug", "Temporary development helper", ->
   
-  bootstrap = libRequire "bootstrap"
-  bootstrap.bootstrap (err, ready)->
+  bootstrap = libRequire "file_subscriber"
 
+  boot = new bootstrap()
 
