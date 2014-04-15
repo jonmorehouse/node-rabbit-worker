@@ -3,7 +3,7 @@ amqp = require 'amqp'
 async = require 'async'
 fs = require 'fs'
 
-# 
+# initialize global variables for test directory 
 global.baseDirectory = path.resolve path.join __dirname, ".."
 global.conn = null
 global.p = console.log
