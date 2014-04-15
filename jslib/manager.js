@@ -11,12 +11,19 @@
 
     /*
       @opts = 
-        queue
+        queue: required - queue to subscribe to (required)
+        error: a writable stream that can be written to  (optional)
+        logger: a logging writable stream  (optional)
+        simultaneous: number of simultaneous workers that we can have
     */
 
 
     function Manager(opts) {
       this.opts = opts;
+      if ((this.opts == null) || (this.opts.queue == null)) {
+        throw new Error("Missing required parameters");
+      }
+      [this._createErrorStream, this._createLogStream, this._createTaskHandler, this._createTaskSubscriber];
       Manager.__super__.constructor.apply(this, arguments);
     }
 
@@ -25,6 +32,14 @@
     Manager.prototype._read = function(size) {};
 
     Manager.prototype._write = function() {};
+
+    Manager.prototype._createErrorStream = function(cb) {};
+
+    Manager.prototype._createLogStream = function(cb) {};
+
+    Manager.prototype._createTaskHandler = function(cb) {};
+
+    Manager.prototype._createTaskSubscriber = function(cb) {};
 
     return Manager;
 

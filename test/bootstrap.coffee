@@ -26,11 +26,8 @@ tearDownFunctions =
   amqp: (cb)->
     if global.conn?
       global.conn.disconnect()
+      delete global.conn
     cb?()
-
-  files: (cb)->
-    async.each (path.join baseDirectory, filename for filename in [".graceful", ".restart", ".kill"]), fs.unlink, (err)-> 
-      cb?()
 
 exports.setUp = (cb)->
   async.waterfall (_function for key, _function of setUpFunctions), (err)->
@@ -39,4 +36,5 @@ exports.setUp = (cb)->
 exports.tearDown = (cb)->
   async.waterfall (_function for key, _function of tearDownFunctions), (err)->
     cb?()
+
 
