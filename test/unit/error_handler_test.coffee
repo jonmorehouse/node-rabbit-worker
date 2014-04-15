@@ -1,5 +1,6 @@
 bootstrap = require "../bootstrap"
-#{Worker} = libRequire "index"
+ErrorHandler = libRequire "error_handler"
+
 
 module.exports = 
 
@@ -13,7 +14,8 @@ module.exports =
     bootstrap.tearDown ->
       cb?()
 
-  #test: (test)->
+  test: (test)->
 
-    #test.done()
+    test.done()
+
 

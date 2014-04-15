@@ -1,5 +1,5 @@
 bootstrap = require "../bootstrap"
-Manager = libRequire "manager"
+#Manager = libRequire "manager"
 
 module.exports = 
 

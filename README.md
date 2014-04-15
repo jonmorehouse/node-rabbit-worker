@@ -39,5 +39,3 @@ Contributing
 * run all tests `cake test`
 
 
-
-
