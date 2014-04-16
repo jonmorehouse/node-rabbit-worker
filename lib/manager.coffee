@@ -1,4 +1,7 @@
 stream = require 'stream'
+async = require 'async'
+ErrorHandler = require './error_handler'
+LogHandler = require './log_handler'
 
 class Manager extends stream.Readable
 
@@ -9,14 +12,25 @@ class Manager extends stream.Readable
       logger: a logging writable stream  (optional)
       simultaneous: number of simultaneous workers that we can have
   ###
-  constructor: (@opts)->
-  
-    if not @opts? or not @opts.queue?
-      throw new Error "Missing required parameters"
-    
-    [@_createErrorStream, @_createLogStream, @_createTaskHandler, @_createTaskSubscriber]
+  constructor: (@opts, cb)->
 
     super
+    if not @opts? or not @opts.queue?
+      err = new  Error "Missing required parameters"
+      return cb err if cb? 
+      throw err
+      
+    methods = [
+      @_createErrorStream, 
+      @_createLogStream, 
+      @_createTaskHandler, 
+      @_createTaskSubscriber
+    ]
+
+    # call each method before our final callback
+    async.waterfall methods, (err)=>
+      return cb? err if err
+      cb?()
 
   close: ()->
 
@@ -28,15 +42,34 @@ class Manager extends stream.Readable
   _write: ()->
   
   # initialization of various internal streams as needed
-  _createErrorStream: (cb)->
+  _createErrorStream: (cb)=>
 
-  _createLogStream: (cb)->
-  
+    # case where we have passed in an error stream
+    if @opts.errors?
+      @error = @opts.error
+      return cb?()
+    
+    # no error handler passed in
+    @error = new ErrorHandler()
+    cb?()
+
+  _createLogStream: (cb)=>
+
+    if @opts.logger?
+      @logger = @opts.logger
+      return cb?()
+
+    # no logger passed in
+    @logger = new LogHandler()
+    cb?()
+
   _createTaskHandler: (cb)->
+
+    cb?()
 
   _createTaskSubscriber: (cb)->
 
-
+    cb?()
 
 
 module.exports = Manager

@@ -2,13 +2,19 @@ path = require 'path'
 amqp = require 'amqp'
 async = require 'async'
 fs = require 'fs'
+stream = require 'stream'
 
-# initialize global variables for test directory 
+# print out all call stack errors - this helps a ton!
+process.on 'uncaughtException', (err)->
+  console.error err.stack
+
+# initialize global variables for helping out with tests
 global.baseDirectory = path.resolve path.join __dirname, ".."
 global.conn = null
 global.p = console.log
 global.libRequire = (_path)->
   return require path.join baseDirectory, "lib", _path
+global.testStream = new stream.Duplex()
 
 setUpFunctions = 
   amqp: (cb)->
@@ -21,8 +27,26 @@ setUpFunctions =
         cb? err if err
     else 
       cb?()
+  exchange: (cb)->
+    global.exchange = conn.exchange "test-exchange", {}, (exchange)->
+      cb?()
+  queue: (cb)->
+    queue = conn.queue "test-queue", (queue)=>
+      global.queue = queue
+      queue.bind exchange.name, (exchange)->
+        cb?()
 
 tearDownFunctions = 
+  queue: (cb)->
+    if global.queue?
+      queue.unbind exchange.name
+      queue.destroy()
+    cb?()
+  exchange: (cb)->
+    if global.exchange?
+      exchange.destroy()
+      delete global.exchange
+    cb?()
   amqp: (cb)->
     if global.conn?
       global.conn.disconnect()
@@ -31,10 +55,11 @@ tearDownFunctions =
 
 exports.setUp = (cb)->
   async.waterfall (_function for key, _function of setUpFunctions), (err)->
-    cb?()
+    p err if err?
+    cb?() 
 
 exports.tearDown = (cb)->
   async.waterfall (_function for key, _function of tearDownFunctions), (err)->
+    p err if err?
     cb?()
-
 

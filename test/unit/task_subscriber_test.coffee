@@ -1,19 +1,20 @@
 bootstrap = require "../bootstrap"
-Manager = libRequire "manager"
+TaskSubscriber = libRequire "task_subscriber"
 
 module.exports = 
 
   setUp: (cb)->
 
-    @manager = new 
-    bootstrap.setUp ->
+    bootstrap.setUp =>
       cb?()
 
   tearDown: (cb)->
-    bootstrap.tearDown ->
+
+    bootstrap.tearDown =>
       cb?()
 
   test: (test)->
 
-    test.done()
+    do test.done
+
 
