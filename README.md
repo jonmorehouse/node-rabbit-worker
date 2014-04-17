@@ -37,5 +37,9 @@ Contributing
 
 * make sure to have RabbitMQ up and running on machine `brew install rabbitmq`
 * run all tests `cake test`
+* note - sometimes when running tests if things broken, you may need to flush your local rabbitmq queues for any hanging processes / queues
+
+
+
 
 
