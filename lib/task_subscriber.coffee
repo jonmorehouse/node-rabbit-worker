@@ -1,5 +1,6 @@
 stream = require 'stream'
 async = require 'async'
+uuid = require 'uuid'
 
 class TaskSubscriber extends stream.Duplex
 
@@ -12,26 +13,34 @@ class TaskSubscriber extends stream.Duplex
         return cb? err 
         throw err
     @tasks = {}
-    @_bootstrap =>
-      cb? null, @
-
-  _bootstrap: (cb)=>
-    
-    # make sure we are subscribed to the queue
     cb?()
+
 
   _write: (chk, size, enc)->
 
-    # a task was handled
-    # remove the id from the hash
-    # now q.shift() # this will allow a new 
+    @_handleTask chk
 
   _read: (size)->
 
     # emit a new task when we are ready
-    @queue.subscribeRaw (msg)=>
+    @queue.subscribe {ack: true}, (message, headers, deliveryInfo, messageObject)=>
 
-      p "MSG RECIEVED"
-      
+      id = uuid.v4()
+      obj = 
+        id: id
+        msg: message
+
+      @tasks[id] = true
+      @push obj
+
+  _handleTask: (id)->
+
+    if @tasks[id]?
+      delete @tasks[id]
+    else
+      @error.write new Error "Invalid task handled #{id}"
+
+    @queue.shift()
 
 module.exports = TaskSubscriber
+
