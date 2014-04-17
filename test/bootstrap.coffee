@@ -14,9 +14,11 @@ global.conn = null
 global.p = console.log
 global.libRequire = (_path)->
   return require path.join baseDirectory, "lib", _path
-global.testStream = new stream.Duplex()
 
 setUpFunctions = 
+  stream: (cb)->
+    global.testStream = new stream.Duplex()
+    cb?()
   amqp: (cb)->
     if not global.conn? 
       conn = amqp.createConnection {host: "localhost", port: 5672}
@@ -28,7 +30,9 @@ setUpFunctions =
     else 
       cb?()
   exchange: (cb)->
-    global.exchange = conn.exchange "test-exchange", {confirm: true, durable: true}, (exchange)->
+    exchange = conn.exchange "test-exchange", {confirm: true}
+    global.exchange = exchange
+    exchange.on "open", (err, exchange)->
       cb?()
   queue: (cb)->
     conn.queue "test-queue", (queue)->
@@ -37,17 +41,26 @@ setUpFunctions =
       cb?()
 
 tearDownFunctions = 
+  stream: (cb)->
+    testStream.end()
+    delete global.testStream
+    cb?()
   queue: (cb)->
+    p "qTD"
     if global.queue?
       queue.unbind exchange.name, "*"
       queue.destroy()
+      delete global.queue
     cb?()
   exchange: (cb)->
+    p "eTD"
     if global.exchange?
+      p "ENDING"
       exchange.destroy()
       delete global.exchange
     cb?()
   amqp: (cb)->
+    p "cTD"
     if global.conn?
       global.conn.disconnect()
       delete global.conn

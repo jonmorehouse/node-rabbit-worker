@@ -32,38 +32,65 @@
         }
       }
       this.tasks = {};
-      if (typeof cb === "function") {
-        cb();
-      }
+      cb(null, this);
     }
 
+    TaskSubscriber.prototype.close = function() {
+      this.stopped = true;
+      this.push(null);
+      return this.queue.unsubscribe;
+    };
+
     TaskSubscriber.prototype._write = function(chk, size, enc) {
-      return this._handleTask(chk);
+      this._handleTask(chk);
+      return this._shifter;
     };
 
     TaskSubscriber.prototype._read = function(size) {
       var _this = this;
-      return this.queue.subscribe({
-        ack: true
-      }, function(message, headers, deliveryInfo, messageObject) {
-        var id, obj;
-        id = uuid.v4();
-        obj = {
-          id: id,
-          msg: message
-        };
-        _this.tasks[id] = true;
-        return _this.push(obj);
-      });
+      if (!this.subscribed && !this.stopped) {
+        this.subscribed = true;
+        return this.queue.subscribe({
+          ack: true
+        }, function(message, headers, deliveryInfo, messageObject) {
+          return _this._newTask(message);
+        });
+      }
+    };
+
+    TaskSubscriber.prototype._newTask = function(msg) {
+      var id, obj;
+      id = uuid.v4();
+      obj = {
+        id: id,
+        msg: msg
+      };
+      this.tasks[id] = true;
+      this.push(obj);
+      return this.queue.shift();
+    };
+
+    TaskSubscriber.prototype._shifter = function() {
+      var key, length;
+      length = ((function() {
+        var _results;
+        _results = [];
+        for (key in this.tasks) {
+          _results.push(key);
+        }
+        return _results;
+      }).call(this)).length;
+      if (length > 0 && length <= this.max) {
+        return this.queue.shift();
+      }
     };
 
     TaskSubscriber.prototype._handleTask = function(id) {
       if (this.tasks[id] != null) {
-        delete this.tasks[id];
+        return delete this.tasks[id];
       } else {
-        this.error.write(new Error("Invalid task handled " + id));
+        return this.error.write(new Error("Invalid task handled " + id));
       }
-      return this.queue.shift();
     };
 
     return TaskSubscriber;

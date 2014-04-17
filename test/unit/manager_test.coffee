@@ -22,7 +22,6 @@ module.exports =
 
     # come back to this
     #test.equals @manager.subscriber?, true
-    #test.equals @manager.handler?, true
     test.done()
 
 
