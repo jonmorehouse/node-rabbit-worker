@@ -13,14 +13,16 @@
     __extends(TaskSubscriber, _super);
 
     function TaskSubscriber(queue, max, logger, error, cb) {
-      var attr, err, methods, _i, _len, _ref,
+      var attr, err, _i, _len, _ref,
         _this = this;
       this.queue = queue;
       this.max = max;
       this.logger = logger;
       this.error = error;
       this._bootstrap = __bind(this._bootstrap, this);
-      TaskSubscriber.__super__.constructor.apply(this, arguments);
+      TaskSubscriber.__super__.constructor.call(this, {
+        objectMode: true
+      });
       _ref = [this.queue, this.max, this.logger, this.error];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         attr = _ref[_i];
@@ -30,9 +32,9 @@
           throw err;
         }
       }
-      methods = [this._bootstrap];
-      async.waterfall(methods, function(err) {
-        return typeof cb === "function" ? cb() : void 0;
+      this.tasks = {};
+      this._bootstrap(function() {
+        return typeof cb === "function" ? cb(null, _this) : void 0;
       });
     }
 
@@ -42,7 +44,13 @@
 
     TaskSubscriber.prototype._write = function(chk, size, enc) {};
 
-    TaskSubscriber.prototype._read = function(size) {};
+    TaskSubscriber.prototype._read = function(size) {
+      var _this = this;
+      this.push("HERE");
+      return this.queue.subscribeRaw(function(msg) {
+        return p("MSG RECIEVED");
+      });
+    };
 
     return TaskSubscriber;
 

@@ -1,6 +1,7 @@
 nodeunit = require 'nodeunit'
 {spawn} = require 'child_process'
 {print} = require 'sys'
+bootstrap = require './test/bootstrap'
 
 task "test", "Run all tests", ->
 

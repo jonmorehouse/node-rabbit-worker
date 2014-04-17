@@ -30,7 +30,7 @@ class Manager extends stream.Readable
     # call each method before our final callback
     async.waterfall methods, (err)=>
       return cb? err if err
-      cb?()
+      cb? null, @
 
   close: ()->
 

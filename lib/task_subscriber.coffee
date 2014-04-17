@@ -5,34 +5,34 @@ class TaskSubscriber extends stream.Duplex
 
   constructor: (@queue, @max, @logger, @error, cb)->
 
-    super
+    super {objectMode: true}
     for attr in [@queue, @max, @logger, @error]
       if not attr?
         err = new Error "Missing parameter"
         return cb? err 
         throw err
-
-    methods = [
-      @_bootstrap
-    ]
-
-    async.waterfall methods, (err)=>
-
-      cb?()
+    @tasks = {}
+    @_bootstrap =>
+      cb? null, @
 
   _bootstrap: (cb)=>
-
+    
     # make sure we are subscribed to the queue
     cb?()
 
   _write: (chk, size, enc)->
 
     # a task was handled
+    # remove the id from the hash
+    # now q.shift() # this will allow a new 
 
   _read: (size)->
 
+    @push "HERE"
     # emit a new task when we are ready
-    #@q.subscribe (message, headers, deliveryInfo, messageObject)->
-      #@push messageObject
+    @queue.subscribeRaw (msg)=>
+
+      p "MSG RECIEVED"
+      
 
 module.exports = TaskSubscriber

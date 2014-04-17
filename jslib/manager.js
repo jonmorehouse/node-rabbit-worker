@@ -44,7 +44,7 @@
         if (err) {
           return typeof cb === "function" ? cb(err) : void 0;
         }
-        return typeof cb === "function" ? cb() : void 0;
+        return typeof cb === "function" ? cb(null, _this) : void 0;
       });
     }
 

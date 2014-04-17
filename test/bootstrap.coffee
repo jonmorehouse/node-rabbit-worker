@@ -28,13 +28,12 @@ setUpFunctions =
     else 
       cb?()
   exchange: (cb)->
-    global.exchange = conn.exchange "test-exchange", {}, (exchange)->
+    global.exchange = conn.exchange "test-exchange", {passive: true, confirm: true, durable: true}, (exchange)->
       cb?()
   queue: (cb)->
-    queue = conn.queue "test-queue", (queue)=>
+    conn.queue "test-queue", (queue)->
       global.queue = queue
-      queue.bind exchange.name, (exchange)->
-        cb?()
+      cb?()
 
 tearDownFunctions = 
   queue: (cb)->
@@ -61,5 +60,19 @@ exports.setUp = (cb)->
 exports.tearDown = (cb)->
   async.waterfall (_function for key, _function of tearDownFunctions), (err)->
     p err if err?
+    cb?()
+
+exports.utilities = 
+
+  publish: (msg, cb)->
+
+    if not cb? 
+      cb = msg
+      msg = {key: "value"}
+
+    # this assumes that the server is in confirm mode ...
+    #exchange.publish queue.name, msg, {}, (err)->
+      #return cb err if err
+      #cb?()
     cb?()
 
