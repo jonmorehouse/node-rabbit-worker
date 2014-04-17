@@ -46,7 +46,6 @@
 
     TaskSubscriber.prototype._read = function(size) {
       var _this = this;
-      this.push("HERE");
       return this.queue.subscribeRaw(function(msg) {
         return p("MSG RECIEVED");
       });
