@@ -28,7 +28,6 @@ class TaskSubscriber extends stream.Duplex
 
   _read: (size)->
 
-    @push "HERE"
     # emit a new task when we are ready
     @queue.subscribeRaw (msg)=>
 
