@@ -46,21 +46,16 @@ tearDownFunctions =
     delete global.testStream
     cb?()
   queue: (cb)->
-    p "qTD"
     if global.queue?
       queue.unbind exchange.name, "*"
       queue.destroy()
       delete global.queue
     cb?()
   exchange: (cb)->
-    p "eTD"
     if global.exchange?
-      p "ENDING"
       exchange.destroy()
       delete global.exchange
     cb?()
-  amqp: (cb)->
-    p "cTD"
     if global.conn?
       global.conn.disconnect()
       delete global.conn

@@ -39,5 +39,3 @@ module.exports =
     do test.done
 
 
-
-    o
