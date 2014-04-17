@@ -56,6 +56,7 @@ tearDownFunctions =
       exchange.destroy()
       delete global.exchange
     cb?()
+  amqp: (cb)->
     if global.conn?
       global.conn.disconnect()
       delete global.conn
