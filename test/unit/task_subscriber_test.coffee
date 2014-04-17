@@ -1,5 +1,6 @@
 stream = require 'stream'
 bootstrap = require "../bootstrap"
+{utilities} = require "../bootstrap"
 TaskSubscriber = libRequire "task_subscriber"
 
 module.exports = 
@@ -15,8 +16,11 @@ module.exports =
 
   test: (test)->
 
+    utilities.publish {test: "TEST"}, (err)->
 
-    do test.done
+      queue.subscribeRaw (msg)->
+
+        do test.done
 
 
 

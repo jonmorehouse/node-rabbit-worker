@@ -28,17 +28,18 @@ setUpFunctions =
     else 
       cb?()
   exchange: (cb)->
-    global.exchange = conn.exchange "test-exchange", {passive: true, confirm: true, durable: true}, (exchange)->
+    global.exchange = conn.exchange "test-exchange", {confirm: true, durable: true}, (exchange)->
       cb?()
   queue: (cb)->
     conn.queue "test-queue", (queue)->
       global.queue = queue
+      queue.bind exchange, "*"
       cb?()
 
 tearDownFunctions = 
   queue: (cb)->
     if global.queue?
-      queue.unbind exchange.name
+      queue.unbind exchange.name, "*"
       queue.destroy()
     cb?()
   exchange: (cb)->
@@ -63,16 +64,12 @@ exports.tearDown = (cb)->
     cb?()
 
 exports.utilities = 
-
   publish: (msg, cb)->
-
     if not cb? 
       cb = msg
       msg = {key: "value"}
-
     # this assumes that the server is in confirm mode ...
-    #exchange.publish queue.name, msg, {}, (err)->
-      #return cb err if err
-      #cb?()
-    cb?()
+    exchange.publish queue.name, msg, {}, (err)->
+      return cb err if err
+      cb?()
 
