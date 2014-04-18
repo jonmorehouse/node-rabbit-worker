@@ -2,7 +2,7 @@ stream = require 'stream'
 
 class TaskHandler extends stream.Writable
 
-  constructor: ->
+  constructor: (@error, @logger) ->
 
     super 
       objectMode: true

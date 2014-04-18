@@ -1,4 +1,5 @@
 bootstrap = require "../bootstrap"
+{utilities} = require "../bootstrap"
 Manager = libRequire "manager"
 
 
@@ -7,22 +8,36 @@ module.exports =
   setUp: (cb)->
 
     bootstrap.setUp =>
-      @manager = new Manager {queue: queue}, (err)->
-
+      new Manager {queue: queue}, (err, manager)=>
+        @manager = manager
         cb?()
 
   tearDown: (cb)->
-    bootstrap.tearDown ->
-      cb?()
+    @manager.close ->
+      bootstrap.tearDown ->
+        cb?()
 
-  managerAttributes: (test)->
+  #managerAttributes: (test)->
 
-    test.equals @manager.error?, true
-    test.equals @manager.logger?, true
+    #test.equals @manager.error?, true
+    #test.equals @manager.logger?, true
 
-    # come back to this
+    ## come back to this
     #test.equals @manager.subscriber?, true
-    test.done()
+    #test.equals @manager.handler?, true
+
+    ## close subscriber
+    #test.equals @manager.close?, true
+    #test.done()
+
+  managerSubscribe: (test)->
+
+    @manager.on "data", (task)=>
+      @manager.write {id: task.id}
+      do test.done
+
+    @manager.subscriber.on "ready", =>
+      utilities.publish (err)->
 
 
 

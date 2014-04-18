@@ -2,29 +2,35 @@ stream = require 'stream'
 async = require 'async'
 ErrorHandler = require './error_handler'
 LogHandler = require './log_handler'
+TaskHandler = require './task_handler'
+TaskSubscriber = require './task_subscriber'
 
 class Manager extends stream.Duplex
 
   ###
     @opts = 
       queue: required - queue to subscribe to (required)
+      max: number of simultaneous workers that we can have (default = 2)
       error: a writable stream that can be written to  (optional)
       logger: a logging writable stream  (optional)
-      simultaneous: number of simultaneous workers that we can have
   ###
   constructor: (@opts, cb)->
 
-    super
+    super {objectMode: true}
     if not @opts? or not @opts.queue?
       err = new  Error "Missing required parameters"
       return cb err if cb? 
       throw err
+    
+    if not @opts.max? 
+      @opts.max = 2
 
     methods = [
       @_createErrorStream, 
       @_createLogStream, 
       @_createTaskHandler, 
-      @_createTaskSubscriber
+      @_createTaskSubscriber,
+      @_pipeErrors,
     ]
 
     # call each method before our final callback
@@ -32,10 +38,30 @@ class Manager extends stream.Duplex
       return cb? err if err
       cb? null, @
 
-  close: ()->
+  close: (cb)->
 
-    # close all of the shits ...
-  
+    @subscriber.close =>
+      @handler.end()
+      cb?()
+
+  # stream api methods
+  _read: (size)->
+
+    @subscriber.on "data", (data)=>
+      @push data
+
+  _write: (chk, enc, cb)->
+
+    @handler.write chk
+
+  _pipeErrors: (cb)=>
+
+    @subscriber.on "error", (err)=>
+      @emit err
+    @handler.on "error", (err)=>
+      @emit err
+    cb?()
+
   # initialization of various internal streams as needed
   _createErrorStream: (cb)=>
 
@@ -58,14 +84,17 @@ class Manager extends stream.Duplex
     @logger = new LogHandler()
     cb?()
 
-  _createTaskHandler: (cb)->
+  _createTaskHandler: (cb)=>
 
+    @handler = new TaskHandler @logger, @error
     cb?()
 
-  _createTaskSubscriber: (cb)->
+  _createTaskSubscriber: (cb)=>
 
-    #@subscriber = new TaskSubscriber  
-    # create task subscriber - pipe
-    cb?()
+    new TaskSubscriber @opts.queue, @opts.max, @handler, @logger, @error, (err, sub)=>
+
+      return cb? err if err
+      @subscriber = sub
+      cb?()
 
 module.exports = Manager
