@@ -2,7 +2,7 @@ stream = require 'stream'
 
 class TaskHandler extends stream.Writable
 
-  constructor: (@logger, @error)->
+  constructor: ->
 
     super 
       objectMode: true
@@ -10,16 +10,14 @@ class TaskHandler extends stream.Writable
 
   _write: (data, enc, cb)->
 
-    cb "TEST"
+    if typeof data == "object"
+      p "OBJECT"
+    else if typeof data == "string"
+      p "STRING"
+    else   
+      return cb new Error "Invalid parameter"
 
-    #if typeof data == "object"
-      #p "OBJECT"
-    #else if typeof data == "string"
-      #p "STRING"
-    #else   
-      #return cb "test ERROR"
-
-    #cb?()
+    cb?()
 
 
 module.exports = TaskHandler

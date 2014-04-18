@@ -1,3 +1,4 @@
+stream = require 'stream'
 require "../bootstrap"
 TaskHandler = libRequire 'task_handler'
 uuid = require 'uuid'
@@ -6,7 +7,7 @@ module.exports =
 
   setUp: (cb)->
 
-    @handler = new TaskHandler testStream, testStream
+    @handler = new TaskHandler() 
     @id = uuid.v1()
     @fixture = 
 
@@ -24,17 +25,12 @@ module.exports =
 
     cb?()
 
-  testInvalidId: (test)->
+  testInvalidId: (_test)->
 
-    #@handler.write {}
-    #@handler.write @id
-    @handler.write 4
     @handler.on "error", (err)->
+      do _test.done
 
-      p "HEADASDF"
-      p err
-
-      do test.done
+    @handler.write 5
 
   testSuccess: (test)->
 
