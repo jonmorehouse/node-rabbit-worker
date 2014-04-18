@@ -1,13 +1,13 @@
 {
-  "name": "node-rabbit-worker",
-  "version": "0.0.0",
+  "name": "rabbit-worker",
+  "version": "1.0.0",
   "description": "Stream based wrapper for working with RabbitMQ",
-  "main": "index.js",
+  "main": "jslib/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cake test"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,10 @@
   "dependencies": {
     "amqp": "^0.2.0",
     "async": "^0.7.0",
-    "touch": "0.0.3",
     "uuid": "^1.4.1",
-    "watch": "^0.9.0",
-    "watchr": "^2.4.11"
-  },
+ },
   "devDependencies": {
     "nodeunit": "^0.8.6"
+    "touch": "0.0.3"
   }
 }
