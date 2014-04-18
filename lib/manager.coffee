@@ -51,6 +51,9 @@ class Manager extends stream.Duplex
     @subscriber.on "data", (data)=>
       @push data
 
+    @subscriber.on "ready", =>
+      @emit "ready"
+
   _write: (chk, enc, cb)->
 
     @handler.write chk

@@ -39,6 +39,6 @@ module.exports =
       @manager.write {id: task.id}
       do test.done
 
-    @manager.subscriber.on "ready", =>
+    @manager.on "ready", =>
       utilities.publish (err)->
 
