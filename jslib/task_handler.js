@@ -9,9 +9,7 @@
   TaskHandler = (function(_super) {
     __extends(TaskHandler, _super);
 
-    function TaskHandler(logger, error) {
-      this.logger = logger;
-      this.error = error;
+    function TaskHandler() {
       TaskHandler.__super__.constructor.call(this, {
         objectMode: true
       });
@@ -19,7 +17,14 @@
     }
 
     TaskHandler.prototype._write = function(data, enc, cb) {
-      return cb("TEST");
+      if (typeof data === "object") {
+        p("OBJECT");
+      } else if (typeof data === "string") {
+        p("STRING");
+      } else {
+        return cb(new Error("Invalid parameter"));
+      }
+      return typeof cb === "function" ? cb() : void 0;
     };
 
     return TaskHandler;

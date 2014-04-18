@@ -8,7 +8,6 @@ module.exports =
 
     bootstrap.setUp =>
       @manager = new Manager {queue: queue}, (err)->
-        p "HERE"
 
         cb?()
 

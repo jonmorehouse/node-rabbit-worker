@@ -11,13 +11,14 @@ class TaskHandler extends stream.Writable
   _write: (data, enc, cb)->
 
     if typeof data == "object"
-      p "OBJECT"
+      @_handleTask data, cb
     else if typeof data == "string"
-      p "STRING"
-    else   
-      return cb new Error "Invalid parameter"
+      @_addTask data, cb
+    return cb new Error "Invalid parameter"
 
-    cb?()
+  _handleTask: (obj, cb)=>
+
+  _addTask: (data, cb)=>
 
 
 module.exports = TaskHandler
