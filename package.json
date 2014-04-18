@@ -1,6 +1,6 @@
 {
   "name": "rabbit-worker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Stream based wrapper for working with RabbitMQ",
   "main": "jslib/index.js",
   "directories": {
