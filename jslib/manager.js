@@ -72,8 +72,11 @@
 
     Manager.prototype._read = function(size) {
       var _this = this;
-      return this.subscriber.on("data", function(data) {
+      this.subscriber.on("data", function(data) {
         return _this.push(data);
+      });
+      return this.subscriber.on("ready", function() {
+        return _this.emit("ready");
       });
     };
 
