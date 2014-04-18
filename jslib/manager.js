@@ -50,10 +50,6 @@
 
     Manager.prototype.close = function() {};
 
-    Manager.prototype._read = function(size) {};
-
-    Manager.prototype._write = function() {};
-
     Manager.prototype._createErrorStream = function(cb) {
       if (this.opts.errors != null) {
         this.error = this.opts.error;
@@ -82,7 +78,7 @@
 
     return Manager;
 
-  })(stream.Readable);
+  })(stream.Duplex);
 
   module.exports = Manager;
 
