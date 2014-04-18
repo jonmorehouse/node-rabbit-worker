@@ -6,19 +6,33 @@ class TaskHandler extends stream.Writable
 
     super 
       objectMode: true
-    @tasks = {}
+    @_tasks = {}
 
-  _write: (data, enc, cb)->
+  _write: (obj, enc, cb)->
+    
+    if not typeof obj == "object" or not obj.id?
+      return cb new Error "Invalid parameter"
 
-    if typeof data == "object"
-      @_handleTask data, cb
-    else if typeof data == "string"
-      @_addTask data, cb
-    return cb new Error "Invalid parameter"
+    if @_tasks[obj.id]?
+      @_handleTask obj, cb
+    else
+      @_addTask obj, cb
 
   _handleTask: (obj, cb)=>
 
-  _addTask: (data, cb)=>
+    task = @_tasks[obj.id]
+    if not task?
+      return cb new Error "Race condition. Task already deleted"
+    delete @_tasks[obj.id]
+    if obj.error? or obj.err?
+      task.retry()
+    else
+      task.acknowledge()
+    cb?()
 
+  _addTask: (obj, cb)=>
+
+    @_tasks[obj.id] = obj
+    cb?()
 
 module.exports = TaskHandler
