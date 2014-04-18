@@ -17,18 +17,21 @@ module.exports =
       bootstrap.tearDown ->
         cb?()
 
-  #managerAttributes: (test)->
+  managerAttributes: (test)->
 
-    #test.equals @manager.error?, true
-    #test.equals @manager.logger?, true
+    @manager.on "data", (task)=>
+    @manager.subscriber.on "ready", =>
 
-    ## come back to this
-    #test.equals @manager.subscriber?, true
-    #test.equals @manager.handler?, true
+      test.equals @manager.error?, true
+      test.equals @manager.logger?, true
 
-    ## close subscriber
-    #test.equals @manager.close?, true
-    #test.done()
+      # come back to this
+      test.equals @manager.subscriber?, true
+      test.equals @manager.handler?, true
+
+      # close subscriber
+      test.equals @manager.close?, true
+      test.done()
 
   managerSubscribe: (test)->
 
@@ -38,7 +41,4 @@ module.exports =
 
     @manager.subscriber.on "ready", =>
       utilities.publish (err)->
-
-
-
 

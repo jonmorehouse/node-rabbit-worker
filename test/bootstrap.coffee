@@ -71,6 +71,7 @@ exports.utilities =
     if not cb? 
       cb = msg
       msg = {key: "value"}
+
     # this assumes that the server is in confirm mode ...
     exchange.publish queue.name, msg, {}, (err)->
       return cb err if err

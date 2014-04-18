@@ -22,6 +22,7 @@
       this.logger = logger;
       this.error = error;
       this._msgReciever = __bind(this._msgReciever, this);
+      this.close = __bind(this.close, this);
       TaskSubscriber.__super__.constructor.call(this, {
         objectMode: true
       });
@@ -37,13 +38,14 @@
       cb(null, this);
     }
 
-    TaskSubscriber.prototype.close = function() {
+    TaskSubscriber.prototype.close = function(cb) {
       var us,
         _this = this;
       this.stopped = true;
       us = this.queue.unsubscribe(this.consumerTag);
       return us.addCallback(function() {
-        return _this.push(null);
+        _this.push(null);
+        return typeof cb === "function" ? cb() : void 0;
       });
     };
 
@@ -56,11 +58,10 @@
           ack: true,
           prefetchCount: this.maxTasks
         }, this._msgReciever);
-        subscription.addCallback(function(ok) {
-          return _this.consumerTag = ok.consumerTag;
-        });
-        return this.queue.on("basicQosOk", function(data) {
+        return subscription.addCallback(function(ok) {
           var emit;
+          _this.consumerTag = ok.consumerTag;
+          _this.queue.on("basicQosOk", function(data) {});
           return emit = _this.emit("ready");
         });
       }

@@ -39,10 +39,11 @@ class Manager extends stream.Duplex
       cb? null, @
 
   close: (cb)->
-
-    @subscriber.close =>
+    @subscriber.on "end", =>
       @handler.end()
       cb?()
+
+    @subscriber.close()
 
   # stream api methods
   _read: (size)->

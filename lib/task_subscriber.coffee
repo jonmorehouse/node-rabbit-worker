@@ -14,12 +14,12 @@ class TaskSubscriber extends stream.Readable
         throw err
     cb null, @
 
-  close: =>
+  close: (cb)=>
     @stopped = true
-    p @consumerTag
     us = @queue.unsubscribe @consumerTag
     us.addCallback =>
       @push null
+      cb?()
 
   _read: (size)->
 
@@ -32,7 +32,6 @@ class TaskSubscriber extends stream.Readable
       # grab / store consumer tag
       subscription.addCallback (ok)=>
         @consumerTag = ok.consumerTag
-
         @queue.on "basicQosOk", (data)=>
         emit = @emit "ready"
 

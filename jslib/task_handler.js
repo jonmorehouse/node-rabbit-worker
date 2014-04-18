@@ -10,7 +10,9 @@
   TaskHandler = (function(_super) {
     __extends(TaskHandler, _super);
 
-    function TaskHandler() {
+    function TaskHandler(error, logger) {
+      this.error = error;
+      this.logger = logger;
       this._addTask = __bind(this._addTask, this);
       this._handleTask = __bind(this._handleTask, this);
       TaskHandler.__super__.constructor.call(this, {
