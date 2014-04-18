@@ -40,8 +40,8 @@ class Manager extends stream.Duplex
 
   close: (cb)->
     @subscriber.on "end", =>
-      @handler.end()
-      cb?()
+      @handler.close =>
+        cb?()
 
     @subscriber.close()
 

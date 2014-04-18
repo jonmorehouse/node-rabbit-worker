@@ -63,8 +63,9 @@
     Manager.prototype.close = function(cb) {
       var _this = this;
       this.subscriber.on("end", function() {
-        _this.handler.end();
-        return typeof cb === "function" ? cb() : void 0;
+        return _this.handler.close(function() {
+          return typeof cb === "function" ? cb() : void 0;
+        });
       });
       return this.subscriber.close();
     };

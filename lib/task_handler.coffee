@@ -1,3 +1,4 @@
+async = require 'async'
 stream = require 'stream'
 
 class TaskHandler extends stream.Writable
@@ -7,6 +8,12 @@ class TaskHandler extends stream.Writable
     super 
       objectMode: true
     @_tasks = {}
+
+  close: (cb)->
+
+    tasks = ({id: id, err: true} for id of @_tasks)
+    async.eachSeries tasks, @_handleTask, (err)->
+      cb?()
 
   _write: (obj, enc, cb)->
     

@@ -18,11 +18,8 @@ module.exports =
         cb?()
 
   tearDown: (cb)->
-    p "teardown 1"
     @subscriber.on "end", =>
-      p "teardown 2"
       bootstrap.tearDown =>
-        p "teardown 3"
         cb?()
     @subscriber.close()
 
