@@ -1,26 +1,24 @@
-#bootstrap = require "../bootstrap"
-#LogHandler = libRequire "error_handler"
+bootstrap = require "../bootstrap"
+LogHandler = libRequire "error_handler"
 
-#module.exports = 
+module.exports = 
 
-  #setUp: (cb)->
+  setUp: (cb)->
 
-    #@handler = new LogHandler()
-    #bootstrap.setUp ->
-      #cb?()
+    @handler = new LogHandler()
+    cb?()
 
-  #tearDown: (cb)->
+  tearDown: (cb)->
 
-    #@handler.end()
-    #bootstrap.tearDown ->
-      #cb?()
+    @handler.end()
+    cb?()
 
-  #testLogHandler: (test)->
+  testLogHandler: (test)->
 
-    #data = {key: "value"}
-    #@handler.write data
-    #@handler.on "data", (_data)->
-      #test.equals data, _data
-      #do test.done
+    data = {key: "value"}
+    @handler.write data
+    @handler.on "data", (_data)->
+      test.equals data, _data
+      do test.done
 
 

@@ -12,13 +12,11 @@ process.on 'uncaughtException', (err)->
 global.baseDirectory = path.resolve path.join __dirname, ".."
 global.conn = null
 global.p = console.log
+global.testStream = new stream.Duplex()
 global.libRequire = (_path)->
   return require path.join baseDirectory, "lib", _path
 
 setUpFunctions = 
-  stream: (cb)->
-    global.testStream = new stream.Duplex()
-    cb?()
   amqp: (cb)->
     if not global.conn? 
       conn = amqp.createConnection {host: "localhost", port: 5672}
@@ -41,10 +39,6 @@ setUpFunctions =
       cb?()
 
 tearDownFunctions = 
-  stream: (cb)->
-    testStream.end()
-    delete global.testStream
-    cb?()
   queue: (cb)->
     if global.queue?
       queue.unbind exchange.name, "*"

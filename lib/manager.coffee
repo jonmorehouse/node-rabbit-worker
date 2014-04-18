@@ -3,7 +3,7 @@ async = require 'async'
 ErrorHandler = require './error_handler'
 LogHandler = require './log_handler'
 
-class Manager extends stream.Readable
+class Manager extends stream.Duplex
 
   ###
     @opts = 
@@ -19,7 +19,7 @@ class Manager extends stream.Readable
       err = new  Error "Missing required parameters"
       return cb err if cb? 
       throw err
-      
+
     methods = [
       @_createErrorStream, 
       @_createLogStream, 
@@ -34,12 +34,7 @@ class Manager extends stream.Readable
 
   close: ()->
 
-  # private stream methods
-  _read: (size)->
-
-    # emit a new task
-
-  _write: ()->
+    # close all of the shits ...
   
   # initialization of various internal streams as needed
   _createErrorStream: (cb)=>
@@ -69,7 +64,8 @@ class Manager extends stream.Readable
 
   _createTaskSubscriber: (cb)->
 
+    #@subscriber = new TaskSubscriber  
+    # create task subscriber - pipe
     cb?()
-
 
 module.exports = Manager
