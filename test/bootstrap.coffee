@@ -30,14 +30,14 @@ setUpFunctions =
     else 
       cb?()
   exchange: (cb)->
-    exchange = conn.exchange "test-exchange", {confirm: true}
-    global.exchange = exchange
-    exchange.on "open", (err, exchange)->
-      cb?()
+    global.exchange = conn.exchange "test-exchange", {confirm: true}
+    exchange.on "error", (err)->
+      cb? err if err
+    cb?()
   queue: (cb)->
-    conn.queue "test-queue", (queue)->
-      global.queue = queue
-      queue.bind exchange, "*"
+    conn.queue "test-queue", (q)->
+      global.queue = q
+      q.bind exchange, "*"
       cb?()
 
 tearDownFunctions = 

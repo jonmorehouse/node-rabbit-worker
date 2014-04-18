@@ -8,34 +8,36 @@ module.exports =
 
   setUp: (cb)->
     @messages = (utilities.publish for i in [1..10])
+    @handlerStream = new stream.Writable {objectMode: true}
+    @handlerStream._write = (msg, enc, cb)=>
+      msg.acknowledge()
+      cb?()
     bootstrap.setUp =>
-      new TaskSubscriber queue, 2, testStream, testStream, (err, manager)=>
-        @manager = manager
+      new TaskSubscriber queue, 2, @handlerStream, testStream, testStream, (err, subscriber)=>
+        @subscriber = subscriber
         cb?()
 
   tearDown: (cb)->
-    @manager.close()
-    bootstrap.tearDown =>
-      cb?()
+    @subscriber.on "end", =>
+      bootstrap.tearDown =>
+        cb?()
+    @subscriber.close()
 
-  testRun: (test)->
+  testShiftingProperly: (test)->
 
     called = 0
-    @manager.on "data", (data)=>
+    @subscriber.on "data", (data)=>
+      called += 1
       test.equal true, data?
       test.equal true, data.id?
       test.equal true, data.msg?
-      called += 1
+      test.equal true, data.headers?
 
-      if called < @messages.length
-        @manager.write data.id
-      else
+      if called == @messages.length
         do test.done
 
+    @subscriber.on "ready", ->
+
+    # lets you know the queue is ready!
     async.waterfall @messages, (err)->
-
-  test: (test)->
-
-    do test.done
-
 

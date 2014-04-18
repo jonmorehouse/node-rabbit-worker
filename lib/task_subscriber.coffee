@@ -2,60 +2,47 @@ stream = require 'stream'
 async = require 'async'
 uuid = require 'uuid'
 
-class TaskSubscriber extends stream.Duplex
+class TaskSubscriber extends stream.Readable
 
-  constructor: (@queue, @max, @logger, @error, cb)->
+  constructor: (@queue, @maxTasks, @handler, @logger, @error, cb)->
 
     super {objectMode: true}
-    for attr in [@queue, @max, @logger, @error]
+    for attr in [@queue, @maxTasks, @logger, @error, @handler]
       if not attr?
         err = new Error "Missing parameter"
         return cb? err 
         throw err
-    @tasks = {}
     cb null, @
-
 
   close: ->
     @stopped = true
-    @push null
-    @queue.unsubscribe 
-
-  _write: (chk, size, enc)->
-
-    @_handleTask chk
-    @_shifter
+    us = @queue.unsubscribe @consumerTag
+    us.addCallback =>
+      @push null
 
   _read: (size)->
 
     if not @subscribed and not @stopped
       @subscribed = true
+
       # emit a new task when we are ready
-      @queue.subscribe {ack: true}, (message, headers, deliveryInfo, messageObject)=>
-          @_newTask message
+      subscription = @queue.subscribe {ack: true, prefetchCount: @maxTasks}, @_msgReciever
 
-  _newTask: (msg)->
+      # grab / store consumer tag
+      subscription.addCallback (ok)=>
+        @consumerTag = ok.consumerTag
 
-      id = uuid.v4()
-      obj = 
-        id: id
-        msg: msg
+      @queue.on "basicQosOk", (data)=>
+        emit = @emit "ready"
 
-      @tasks[id] = true
-      @push obj
-      @queue.shift()
+  _msgReciever: (message, headers, deliveryInfo, messageObject)=>
 
-  _shifter: ->
-      length = (key for key of @tasks).length
-      if length > 0 and length <= @max
-        @queue.shift()
-
-  _handleTask: (id)->
-
-    if @tasks[id]?
-      delete @tasks[id]
-    else
-      @error.write new Error "Invalid task handled #{id}"
+    id = uuid.v1()
+    messageObject.id = id
+    @handler.write messageObject
+    @push 
+      id: id
+      headers: headers
+      msg: message
 
 module.exports = TaskSubscriber
-
