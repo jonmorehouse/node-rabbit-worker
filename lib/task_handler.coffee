@@ -4,19 +4,16 @@ stream = require 'stream'
 class TaskHandler extends stream.Writable
 
   constructor: (@error, @logger) ->
-
     super 
       objectMode: true
     @_tasks = {}
 
-  close: (cb)->
-
+  close: (cb) ->
     tasks = ({id: id, err: true} for id of @_tasks)
-    async.eachSeries tasks, @_handleTask, (err)->
+    async.eachSeries tasks, @_handleTask, (err) ->
       cb?()
 
-  _write: (obj, enc, cb)->
-    
+  _write: (obj, enc, cb) ->
     if not typeof obj == "object" or not obj.id?
       return cb new Error "Invalid parameter"
 
@@ -25,8 +22,7 @@ class TaskHandler extends stream.Writable
     else
       @_addTask obj, cb
 
-  _handleTask: (obj, cb)=>
-
+  _handleTask: (obj, cb) =>
     task = @_tasks[obj.id]
     if not task?
       return cb new Error "Race condition. Task already deleted"
@@ -37,8 +33,7 @@ class TaskHandler extends stream.Writable
       task.acknowledge()
     cb?()
 
-  _addTask: (obj, cb)=>
-
+  _addTask: (obj, cb) =>
     @_tasks[obj.id] = obj
     cb?()
 

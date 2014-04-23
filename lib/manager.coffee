@@ -14,8 +14,7 @@ class Manager extends stream.Duplex
       error: a writable stream that can be written to  (optional)
       logger: a logging writable stream  (optional)
   ###
-  constructor: (@opts, cb)->
-
+  constructor: (@opts, cb) ->
     super {objectMode: true}
     if not @opts? or not @opts.queue?
       err = new  Error "Missing required parameters"
@@ -34,11 +33,11 @@ class Manager extends stream.Duplex
     ]
 
     # call each method before our final callback
-    async.waterfall methods, (err)=>
+    async.waterfall methods, (err) =>
       return cb? err if err
       cb? null, @
 
-  close: (cb)->
+  close: (cb) ->
     @subscriber.on "end", =>
       @handler.close =>
         cb?()
@@ -46,29 +45,25 @@ class Manager extends stream.Duplex
     @subscriber.close()
 
   # stream api methods
-  _read: (size)->
-
-    @subscriber.on "data", (data)=>
+  _read: (size) ->
+    @subscriber.on "data", (data) =>
       @push data
 
     @subscriber.on "ready", =>
       @emit "ready"
 
-  _write: (chk, enc, cb)->
-
+  _write: (chk, enc, cb) ->
     @handler.write chk
 
-  _pipeErrors: (cb)=>
-
-    @subscriber.on "error", (err)=>
+  _pipeErrors: (cb) =>
+    @subscriber.on "error", (err) =>
       @emit err
-    @handler.on "error", (err)=>
+    @handler.on "error", (err) =>
       @emit err
     cb?()
 
   # initialization of various internal streams as needed
-  _createErrorStream: (cb)=>
-
+  _createErrorStream: (cb) =>
     # case where we have passed in an error stream
     if @opts.errors?
       @error = @opts.error
@@ -78,8 +73,7 @@ class Manager extends stream.Duplex
     @error = new ErrorHandler()
     cb?()
 
-  _createLogStream: (cb)=>
-
+  _createLogStream: (cb) =>
     if @opts.logger?
       @logger = @opts.logger
       return cb?()
@@ -88,14 +82,12 @@ class Manager extends stream.Duplex
     @logger = new LogHandler()
     cb?()
 
-  _createTaskHandler: (cb)=>
-
+  _createTaskHandler: (cb) =>
     @handler = new TaskHandler @logger, @error
     cb?()
 
-  _createTaskSubscriber: (cb)=>
-
-    new TaskSubscriber @opts.queue, @opts.max, @handler, @logger, @error, (err, sub)=>
+  _createTaskSubscriber: (cb) =>
+    new TaskSubscriber @opts.queue, @opts.max, @handler, @logger, @error, (err, sub) =>
 
       return cb? err if err
       @subscriber = sub

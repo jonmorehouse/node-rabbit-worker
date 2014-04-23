@@ -4,8 +4,7 @@ uuid = require 'uuid'
 
 class TaskSubscriber extends stream.Readable
 
-  constructor: (@queue, @maxTasks, @handler, @logger, @error, cb)->
-
+  constructor: (@queue, @maxTasks, @handler, @logger, @error, cb) ->
     super {objectMode: true}
     for attr in [@queue, @maxTasks, @logger, @error, @handler]
       if not attr?
@@ -14,15 +13,14 @@ class TaskSubscriber extends stream.Readable
         throw err
     cb null, @
 
-  close: (cb)=>
+  close: (cb) =>
     @stopped = true
     us = @queue.unsubscribe @consumerTag
     us.addCallback =>
       @push null
       cb?()
 
-  _read: (size)->
-
+  _read: (size) ->
     if not @subscribed and not @stopped
       @subscribed = true
 
@@ -30,13 +28,12 @@ class TaskSubscriber extends stream.Readable
       subscription = @queue.subscribe {ack: true, prefetchCount: @maxTasks}, @_msgReciever
 
       # grab / store consumer tag
-      subscription.addCallback (ok)=>
+      subscription.addCallback (ok) =>
         @consumerTag = ok.consumerTag
-        @queue.on "basicQosOk", (data)=>
+        @queue.on "basicQosOk", (data) =>
         emit = @emit "ready"
 
-  _msgReciever: (message, headers, deliveryInfo, messageObject)=>
-
+  _msgReciever: (message, headers, deliveryInfo, messageObject) =>
     id = uuid.v1()
     messageObject.id = id
     @handler.write messageObject

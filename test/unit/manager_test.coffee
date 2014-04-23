@@ -5,21 +5,19 @@ Manager = libRequire "manager"
 
 module.exports = 
 
-  setUp: (cb)->
-
+  setUp: (cb) ->
     bootstrap.setUp =>
-      new Manager {queue: queue}, (err, manager)=>
+      new Manager {queue: queue}, (err, manager) =>
         @manager = manager
         cb?()
 
-  tearDown: (cb)->
+  tearDown: (cb) ->
     @manager.close ->
       bootstrap.tearDown ->
         cb?()
 
-  managerAttributes: (test)->
-
-    @manager.on "data", (task)=>
+  managerAttributes: (test) ->
+    @manager.on "data", (task) =>
     @manager.subscriber.on "ready", =>
 
       test.equals @manager.error?, true
@@ -33,13 +31,10 @@ module.exports =
       test.equals @manager.close?, true
       test.done()
 
-  managerSubscribe: (test)->
-
-    @manager.on "data", (task)=>
+  managerSubscribe: (test) ->
+    @manager.on "data", (task) =>
       @manager.write {id: task.id}
       do test.done
 
     @manager.on "ready", =>
-      utilities.publish (err)->
-
-
+      utilities.publish (err) ->

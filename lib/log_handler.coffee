@@ -6,7 +6,7 @@ class LogHandler extends stream.Transform
     super
       objectMode: true
 
-  _write: (chk, size, enc)->
+  _write: (chk, size, enc) ->
     @push chk
 
 

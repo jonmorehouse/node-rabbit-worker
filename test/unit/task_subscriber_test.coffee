@@ -6,27 +6,26 @@ TaskSubscriber = libRequire "task_subscriber"
 
 module.exports = 
 
-  setUp: (cb)->
+  setUp: (cb) ->
     @messages = (utilities.publish for i in [1..10])
     @handlerStream = new stream.Writable {objectMode: true}
-    @handlerStream._write = (msg, enc, cb)=>
+    @handlerStream._write = (msg, enc, cb) =>
       msg.acknowledge()
       cb?()
     bootstrap.setUp =>
-      new TaskSubscriber queue, 2, @handlerStream, testStream, testStream, (err, subscriber)=>
+      new TaskSubscriber queue, 2, @handlerStream, testStream, testStream, (err, subscriber) =>
         @subscriber = subscriber
         cb?()
 
-  tearDown: (cb)->
+  tearDown: (cb) ->
     @subscriber.on "end", =>
       bootstrap.tearDown =>
         cb?()
     @subscriber.close()
 
-  testShiftingProperly: (test)->
-
+  testShiftingProperly: (test) ->
     called = 0
-    @subscriber.on "data", (data)=>
+    @subscriber.on "data", (data) =>
       called += 1
       test.equal true, data?
       test.equal true, data.id?
@@ -38,5 +37,4 @@ module.exports =
 
     @subscriber.on "ready", =>
       # lets you know the queue is ready!
-      async.waterfall @messages, (err)->
-
+      async.waterfall @messages, (err) ->

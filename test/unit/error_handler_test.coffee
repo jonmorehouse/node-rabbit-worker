@@ -3,21 +3,18 @@ ErrorHandler = libRequire "error_handler"
 
 module.exports = 
 
-  setUp: (cb)->
-
+  setUp: (cb) ->
     @handler = new ErrorHandler()
     cb?()
 
-  tearDown: (cb)->
-
+  tearDown: (cb) ->
     @handler.end()
     cb?()
 
-  testErrorHandler: (test)->
-
+  testErrorHandler: (test) ->
     data = {key: "value"}
     @handler.write data
-    @handler.on "data", (_data)->
+    @handler.on "data", (_data) ->
       test.equals data, _data
       do test.done
 
